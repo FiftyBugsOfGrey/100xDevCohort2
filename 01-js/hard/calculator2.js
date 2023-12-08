@@ -107,49 +107,7 @@ class Calculator {
       throw new Error("mismatch")
     }
 
-    let expressionArray = expression.split(/(\(|\)|\+|\-|\*|\/)/).filter(el => el != '');
-    let bracketStartIndex = expressionArray.lastIndexOf('(');
-    let bracketEndIndex;
-    while (bracketStartIndex > -1) {
-
-      bracketEndIndex = expressionArray.indexOf(')', bracketStartIndex);
-      let slicedExpressionArray = expressionArray.slice(bracketStartIndex + 1, bracketEndIndex);
-      let length = slicedExpressionArray.length + 2;
-      let slicedArraySolution = this.solveSimpleExpression(slicedExpressionArray);
-      expressionArray.splice(bracketStartIndex, length, slicedArraySolution)
-      bracketStartIndex = expressionArray.lastIndexOf('(');
-    }
-    this.result = this.solveSimpleExpression(expressionArray);
-
-
-
-  }
-
-  solveSimpleExpression(expression) {
-
-    let operatorsArray = ['/', '*', '+', '-'];
-    for (var i = 0; i <= operatorsArray.length;) {
-      let result = 0;
-      let indexOfOperator = expression.indexOf(operatorsArray[i]);
-      if (indexOfOperator > -1) {
-        if (operatorsArray[i] === '/') {
-          result = expression[indexOfOperator - 1] / expression[indexOfOperator + 1];
-        } else if (operatorsArray[i] === '*') {
-          result = expression[indexOfOperator - 1] * expression[indexOfOperator + 1];
-        } else if (operatorsArray[i] === '+') {
-          result = +expression[indexOfOperator - 1] + +expression[indexOfOperator + 1];
-        } else if (operatorsArray[i] === '-') {
-          result = expression[indexOfOperator - 1] - expression[indexOfOperator + 1];
-        } else {
-          throw new Error("Fatal error")
-        }
-        expression.splice(indexOfOperator - 1, 3, result);
-      } else {
-        i++
-      }
-
-    }
-    return expression[0]
+    this.result = new Function('return ' + expression)()
 
   }
 
@@ -163,7 +121,6 @@ class Calculator {
 
 }
 
-
 module.exports = Calculator;
 /*
  PASS  ../tests/calculator.test.js
@@ -171,25 +128,23 @@ module.exports = Calculator;
     ✓ addition (2 ms)
     ✓ subtraction (1 ms)
     ✓ multiplication (1 ms)
-    ✓ division (11 ms)
+    ✓ division (8 ms)
     ✓ clear
-    ✓ calculate addition and multiplication
+    ✓ calculate addition and multiplication (1 ms)
     ✓ calculate division in expression
-    ✓ calculate subtraction in expression
-    ✓ calculate complex expression (1 ms)
-    ✓ calculate complex expression with spaces (1 ms)
+    ✓ calculate subtraction in expression (1 ms)
+    ✓ calculate complex expression
+    ✓ calculate complex expression with spaces
     ✓ calculate expression with decimals (1 ms)
     ✓ calculate expression with invalid characters (1 ms)
     ✓ calculate division by zero (1 ms)
-    ✓ multiplication with negative numbers
+    ✓ multiplication with negative numbers (1 ms)
     ✓ division with decimal numbers
-    ✓ expression with invalid parentheses (2 ms)
+    ✓ expression with invalid parentheses (1 ms)
 
 Test Suites: 1 passed, 1 total
 Tests:       16 passed, 16 total
 Snapshots:   0 total
-Time:        0.222 s, estimated 1 s
+Time:        0.351 s, estimated 1 s
 Ran all test suites matching /.\/tests\/calculator.test.js/i.
-
-
 */
