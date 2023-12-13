@@ -18,11 +18,11 @@ function clearLine() {
 let counter = 0;
 
 function writeCounter() {
-	setTimeout(() => {
-	  clearLine();
-	  process.stdout.write(String(counter++));
-	  writeCounter();
-	}, 1000);
+  setTimeout(() => {
+    clearLine();
+    process.stdout.write(String(counter++));
+    writeCounter();
+  }, 1000);
 }
 
 
