@@ -39,11 +39,107 @@
 
   Testing the server - run `npm run test-todoServer` command in terminal
  */
-  const express = require('express');
-  const bodyParser = require('body-parser');
-  
-  const app = express();
-  
-  app.use(bodyParser.json());
-  
-  module.exports = app;
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+const todos = [];
+let todoId = 0;
+
+app.use(bodyParser.json());
+
+app.get('/todos', function(req, res) {
+  res.json(todos)
+
+})
+
+app.get('/todos/:id', function(req, res) {
+  let todoId = req.params.id;
+
+
+  let result = todos.findIndex(({
+    id
+  }) => {
+    return id == todoId
+  });
+
+  if (result > -1) {
+    res.status(200).json(todos[result])
+  } else {
+    res.status(404).send('not found');
+
+  }
+})
+
+app.post('/todos', function(req, res) {
+  let {
+    title,
+    completed,
+    description
+  } = req.body;
+  todoId++;
+  todos.push({
+    id: todoId,
+    title,
+    completed,
+    description
+  });
+
+  res.status(201).json({
+    id: todoId
+  })
+})
+
+app.put('/todos/:id', function(req, res) {
+  let todoId = req.params.id
+  let {
+    title,
+    completed,
+    description
+  } = req.body;
+
+  let result = todos.findIndex(({
+    id
+  }) => id == todoId);
+
+  if (result > -1) {
+    if (title) todos[result].title = title
+    if (completed) todos[result].completed = completed;
+    if (description) todos[result].description = description;
+
+
+    res.status(200).send('ok')
+
+  } else {
+    res.status(404).send('not found');
+
+  }
+})
+
+app.delete('/todos/:id', function(req, res) {
+  let todoId = req.params.id
+  let result = todos.findIndex(({
+    id
+  }) => id == todoId);
+
+  if (result > -1) {
+    todos.splice(result, 1);
+    res.status(200).send('ok')
+  } else {
+    res.status(404).send('not found');
+
+  }
+})
+
+
+app.all('*', (req, res) => {
+  res.status(404).send('Route not found');
+});
+
+app.use(function(err, req, res, next) {
+  res.status(500).send('something went wrong');
+})
+
+// app.listen(3000)
+
+module.exports = app;
