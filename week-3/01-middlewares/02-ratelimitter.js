@@ -16,6 +16,25 @@ setInterval(() => {
     numberOfRequestsForUser = {};
 }, 1000)
 
+function rateChecker(req, rest, next) {
+  let id = req.header('user-id');
+  if (numberOfRequestsForUser[id]) {
+    if (numberOfRequestsForUser[id] > 5) {
+      res.status(404).send('not found');
+    }
+    else {
+      numberOfRequestsForUser[id] += 1
+    }
+  }
+    else {
+      numberOfRequestsForUser[id] = 1
+    }
+
+  next()
+}
+
+app.use(rateChecker)
+
 app.get('/user', function(req, res) {
   res.status(200).json({ name: 'john' });
 });
@@ -23,5 +42,8 @@ app.get('/user', function(req, res) {
 app.post('/user', function(req, res) {
   res.status(200).json({ msg: 'created dummy user' });
 });
+
+app.listen(3000)
+
 
 module.exports = app;
