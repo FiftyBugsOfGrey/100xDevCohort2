@@ -1,22 +1,74 @@
-const { Router } = require("express");
+const {
+  Router
+} = require("express");
 const router = Router();
 const userMiddleware = require("../middleware/user");
+const {
+  User,
+  Course
+} = require("../db/index");
 
 // User Routes
 router.post('/signup', (req, res) => {
-    // Implement user signup logic
+  let {
+    username,
+    password
+  } = req.body;
+
+  const newUser = new User({
+    username,
+    password
+  });
+  newUser.save().then(() => {
+    res.json({
+      message: 'User created successfully'
+    })
+  }).catch(() => {
+    res.sendStatus(500)
+  })
 });
 
 router.get('/courses', (req, res) => {
-    // Implement listing all courses logic
+  Course.find({}).then(courses => {
+    res.json(courses)
+  });
 });
 
 router.post('/courses/:courseId', userMiddleware, (req, res) => {
-    // Implement course purchase logic
+  let {
+    username,
+  } = req.body;
+
+  User.findOneAndUpdate({
+    username
+  }, {
+    $push: {
+      purchased: req.params.courseId
+    }
+  }).then((resolve, reject) => {
+    res.json({
+      message: 'course purchased successfully'
+    })
+  }).catch((error) => {
+    res.sendStatus(500)
+  })
 });
 
 router.get('/purchasedCourses', userMiddleware, (req, res) => {
-    // Implement fetching purchased courses logic
+  let username = req.headers.username;
+  User.findOne({
+    username
+  }).then(courses => {
+    Course.find({
+      _id: {
+        $in: courses.purchased
+      }
+    }).then(courses => {
+      res.json(courses)
+    });
+  }).catch((error) => {
+    res.sendStatus(500)
+  });
 });
 
 module.exports = router
